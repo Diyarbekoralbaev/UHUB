@@ -1,7 +1,8 @@
 import aiohttp
 import openai
 from eskiz.client import SMSClient
-
+import asyncio
+import uuid
 
 openai_api_key = "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"  # Use your OpenAI API key
 appid = 'e5910f3cccef5829b2abfd2e60b5afb0'  # Use your OpenWeatherMap API key
@@ -70,16 +71,23 @@ client = SMSClient(
 )
 
 async def fetch_air_quality(lat, lon):
+    if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+        return None
+
     async with aiohttp.ClientSession() as session:
         url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={appid}"
         async with session.get(url) as response:
             if response.status == 200:
                 return await response.json()
             else:
-                print("Failed to fetch data")
+                print("Failed to fetch air quality data")
                 return None
+            
 
 async def get_aqi_level(latitude, longitude):
+    if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
+        return None
+
     async with aiohttp.ClientSession() as session:
         url = f"https://api.waqi.info/feed/geo:{latitude};{longitude}/?token=361cb6093b99301f665c15f9f5640e1a64a05a44"
         async with session.get(url) as response:
@@ -87,27 +95,23 @@ async def get_aqi_level(latitude, longitude):
                 data = await response.json()
                 return data['data']['aqi']
             else:
-                print("Failed to fetch data")
+                print("Failed to fetch AQI level")
                 return None
 
 
 
 async def get_aqi_info(latitude, longitude):
-    async with aiohttp.ClientSession() as session:
-        url = f"https://api.waqi.info/feed/geo:{latitude};{longitude}/?token=361cb6093b99301f665c15f9f5640e1a64a05a44"
-        async with session.get(url) as response:
-            if response.status == 200:
-                data = await response.json()
-                aqi = data['data']['aqi']
-                return air_quality(aqi)
+    return await get_aqi_level(latitude, longitude)
                 
 
 
 async def get_health_recommendations(lat, lon, max_tokens=None):
     openai.api_key = openai_api_key
     
-    data = await fetch_air_quality(lat, lon)
-    aqi_level = await get_aqi_level(lat, lon)
+    air_quality_task = fetch_air_quality(lat, lon)
+    aqi_level_task = get_aqi_level(lat, lon)
+    
+    data, aqi_level = await asyncio.gather(air_quality_task, aqi_level_task)
 
     pollutants = data['list'][0]['components']
     prompt = f"The current air quality index (AQI) is {aqi_level}, with pollutant concentrations as follows: " \
