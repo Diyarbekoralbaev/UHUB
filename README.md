@@ -1,2 +1,0 @@
-# UHUB
-Open Data Challange
