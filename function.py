@@ -15,7 +15,7 @@ def air_quality(aqi):
             "color": "#00e400",
             "implications": "Air quality is considered satisfactory, and air pollution poses little or no risk",
             "cautionary": "None"
-        }
+        } 
         return data
     elif aqi <= 100 and aqi > 50:
         data = {
@@ -116,6 +116,7 @@ async def get_health_recommendations(lat, lon, max_tokens=None):
              f"PM10: {pollutants['pm10']} μg/m3, NH3: {pollutants['nh3']} μg/m3. Based on these levels, " \
              f"what are the recommended health precautions for the general public and sensitive groups?"
 
+
     # Using the chat API for a conversational model
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",  # Ensure you're using a model suitable for chat
@@ -141,4 +142,3 @@ async def send_sms(number, message):
 async def send_health_recommendations(lat, lon, number):
     message = get_health_recommendations(lat, lon, max_tokens=100)
     return send_sms(number, message)
-

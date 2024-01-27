@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from UHUB.function import *
+from function import *
 from pydantic import BaseModel
 
 app = FastAPI()
