@@ -2,7 +2,7 @@ import psycopg2
 
 # Database connection parameters
 db_params = {
-    'dbname': 'HarmX',
+    'dbname': 'harmx',
     'user': 'postgres',
     'password': '02052005',
     'host': 'localhost',  # or your database server address
