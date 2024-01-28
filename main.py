@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from function import *
 from pydantic import BaseModel
 import json
@@ -13,6 +14,16 @@ app = FastAPI()
 FILES_DIRECTORY = "files"
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 10 MB limit
 ALLOWED_FILE_TYPES = {"image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp", "video/mp4", "video/mpeg", "video/webm", "application/pdf"}
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
 
 class Get_health(BaseModel):
     lat: str
