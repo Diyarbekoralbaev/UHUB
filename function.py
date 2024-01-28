@@ -2,14 +2,13 @@ import aiohttp
 import openai
 from eskiz.client import SMSClient
 import asyncio
-import uuid
 
 openai_api_key = "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"  # Use your OpenAI API key
 appid = 'e5910f3cccef5829b2abfd2e60b5afb0'  # Use your OpenWeatherMap API key
 
 
 def air_quality(aqi):
-    if aqi <= 50:
+    if int(aqi) <= 50:
         data = {
             "aqi": aqi,
             "level": "Good",
@@ -18,7 +17,7 @@ def air_quality(aqi):
             "cautionary": "None"
         } 
         return data
-    elif aqi <= 100 and aqi > 50:
+    elif int(aqi) <= 100 and int(aqi) > 50:
         data = {
             "aqi": aqi,
             "level": "Moderate",
@@ -27,7 +26,7 @@ def air_quality(aqi):
             "cautionary": "Active children and adults, and people with respiratory disease, such as asthma, should limit prolonged outdoor exertion"
         }
         return data
-    elif aqi <= 150 and aqi > 100:
+    elif int(aqi) <= 150 and int(aqi) > 100:
         data = {
             "aqi": aqi,
             "level": "Unhealthy for Sensitive Groups",
@@ -36,7 +35,7 @@ def air_quality(aqi):
             "cautionary": "Active children and adults, and people with respiratory disease, such as asthma, should limit prolonged outdoor exertion."
         }
         return data
-    elif aqi <= 200 and aqi > 150:
+    elif int(aqi) <= 200 and int(aqi) > 150:
         data = {
             "aqi": aqi,
             "level": "Unhealthy",
@@ -45,7 +44,7 @@ def air_quality(aqi):
             "cautionary": "Active children and adults, and people with respiratory disease, such as asthma, should avoid prolonged outdoor exertion; everyone else, especially children, should limit prolonged outdoor exertion"
         }
         return data
-    elif aqi <= 300 and aqi > 200:
+    elif int(aqi) <= 300 and int(aqi) > 200:
         data = {
             "aqi": aqi,
             "level": "Very Unhealthy",
@@ -54,7 +53,7 @@ def air_quality(aqi):
             "cautionary": "Active children and adults, and people with respiratory disease, such as asthma, should avoid all outdoor exertion; everyone else, especially children, should limit outdoor exertion."
         }
         return data
-    elif aqi > 300:
+    elif int(aqi) > 300:
         data = {
             "aqi": aqi,
             "level": "Hazardous",
@@ -71,7 +70,7 @@ client = SMSClient(
 )
 
 async def fetch_air_quality(lat, lon):
-    if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+    if not (-90 <= int(lat) <= 90) or not (-180 <= int(lon) <= 180):
         return None
 
     async with aiohttp.ClientSession() as session:
@@ -85,7 +84,7 @@ async def fetch_air_quality(lat, lon):
             
 
 async def get_aqi_level(latitude, longitude):
-    if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
+    if not (-90 <= int(latitude) <= 90) or not (-180 <= int(longitude) <= 180):
         return None
 
     async with aiohttp.ClientSession() as session:
@@ -101,7 +100,9 @@ async def get_aqi_level(latitude, longitude):
 
 
 async def get_aqi_info(latitude, longitude):
-    return await get_aqi_level(latitude, longitude)
+    data = await get_aqi_level(latitude, longitude)
+    info = air_quality(data)
+    return info
                 
 
 
